@@ -15,10 +15,10 @@ override.tf.json
 terraform.rc
 .terragrunt-cache/
 
-# Local plan / destroy artifacts
-plan
+# Local plan / destroy artifacts (repo-root only)
+/plan
 *.plan
-destroy
+/destroy
 
 # Editor / OS
 .idea/

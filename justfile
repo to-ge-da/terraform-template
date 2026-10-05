@@ -2,8 +2,9 @@
 @fmt:
     terraform fmt -write=true -recursive
 
-# Validate Terraform configuration
+# Init (no backend) then validate — matches CI validate path
 @validate:
+    terraform init -backend=false
     terraform validate
 
 # Initialize Terraform (providers / modules / backend)
@@ -15,8 +16,8 @@
     terraform plan -out plan {{ ARGS }}
 
 # Apply the saved ./plan file
-@apply *ARGS:
-    terraform apply plan {{ ARGS }}
+@apply:
+    terraform apply plan
 
 # Plan a destroy, then confirm before applying it
 @destroy *ARGS:
@@ -37,24 +38,10 @@
 # CI workflow hygiene (zizmor + pinact verify)
 [working-directory('.github')]
 @ci-scan:
-    zizmor dependabot.yml ./workflows/*.yml --no-exit-codes
+    zizmor dependabot.yml ./workflows/*.yml
     pinact run --verify ./workflows/*.yml
 
 # Pin GitHub Actions to immutable SHAs
 [working-directory('.github')]
 @ci-pin:
     pinact run ./workflows/*.yml
-
-# List mise tools installed for this directory
-@mise-tools:
-    mise ls --json | jq -r --arg pwd "$(pwd)" 'to_entries[] | select(.value[].source.path != null and (.value[].source.path | contains($pwd))) | .key'
-
-alias t := mise-tools
-
-# Preview local mise.toml tool upgrades (no changes)
-@mise-upgrade-dry:
-    mise upgrade --local --dry-run
-
-# Apply tool upgrades from local mise.toml only
-@mise-upgrade:
-    mise upgrade --local

@@ -25,8 +25,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install mise tools
+      - name: Install hygiene tools
         uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          # Only zizmor + pinact — do not install terraform/just/jq here.
+          install_args: zizmor pinact
 
       - name: Scan workflows (zizmor + pinact)
         run: |
@@ -47,8 +50,12 @@ jobs:
 
       - name: Soft-skip or run Terraform checks
         run: |
-          if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then
-            echo "No *.tf yet — skipping Terraform checks (template scaffold)."
+          # Soft-skip unless root-module HCL exists. This template CI assumes a
+          # single root module at / (root *.tf / *.tf.json only; not nested paths).
+          shopt -s nullglob
+          root_hcl=(*.tf *.tf.json)
+          if (( ${#root_hcl[@]} == 0 )); then
+            echo "No root *.tf / *.tf.json — skipping Terraform checks (template scaffold)."
             exit 0
           fi
           terraform fmt -check -recursive
