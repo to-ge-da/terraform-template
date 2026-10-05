@@ -1,39 +1,35 @@
-# Soft-skip Terraform recipes when no *.tf exists yet (empty template stays green).
-
 # Format Terraform files in place
 @fmt:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping fmt."; else terraform fmt -write=true -recursive; fi
+    terraform fmt -write=true -recursive
 
 # Validate Terraform configuration
 @validate:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping validate."; else terraform validate; fi
+    terraform validate
 
 # Initialize Terraform (providers / modules / backend)
 @init *ARGS:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping init."; else terraform init {{ ARGS }}; fi
+    terraform init {{ ARGS }}
 
 # Create a plan and save it to ./plan
 @plan *ARGS:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping plan."; else terraform plan -out plan {{ ARGS }}; fi
+    terraform plan -out plan {{ ARGS }}
 
 # Apply the saved ./plan file
 @apply *ARGS:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping apply."; else terraform apply plan {{ ARGS }}; fi
+    terraform apply plan {{ ARGS }}
 
 # Plan a destroy, then confirm before applying it
 @destroy *ARGS:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping destroy."; else terraform plan -destroy -out destroy {{ ARGS }} && just _destroy-apply; fi
+    terraform plan -destroy -out destroy {{ ARGS }}
+    just _destroy-apply
 
 [confirm("Destroy all Terraform-managed resources? This cannot be undone.")]
 @_destroy-apply:
     terraform apply destroy
 
 # Remove local Terraform artifacts (does not destroy cloud resources)
-@cleanup:
-    if ! find . -name '*.tf' -not -path './.terraform/*' -print -quit | grep -q .; then echo "No *.tf yet — skipping cleanup."; else just _cleanup-local; fi
-
 [confirm("Remove local .terraform / plan / state artifacts? Cloud resources are not destroyed.")]
-@_cleanup-local:
+@cleanup:
     rm -rf .terraform
     rm -f plan destroy crash.log crash.*.log *.tfstate *.tfstate.*
     echo "Local Terraform artifacts removed."

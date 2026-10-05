@@ -8,7 +8,7 @@ Org defaults (tooling, CI, GitHub templates) **without** product HCL — no `ver
 
 1. Click **Use this template** → **Create a new repository**.
 2. Clone, then `mise install`.
-3. Run `just --list` for tasks. Terraform recipes and CI soft-skip until you add `*.tf`.
+3. Run `just --list` for tasks. Add `*.tf`, then use `just init` / `just plan` / `just apply` as usual.
 
 ## Included files
 
@@ -18,8 +18,8 @@ Org defaults (tooling, CI, GitHub templates) **without** product HCL — no `ver
 | `justfile` | fmt/validate/init/plan/apply/destroy/cleanup, CI scan/pin, mise helpers |
 | `mise.toml` | Terraform + `jq`, `zizmor`, `pinact` |
 | `.gitignore` | Terraform / local / env ignores |
-| `.github/workflows/ci.yml` | Light CI (hygiene; Terraform soft-skip) |
-| `.github/dependabot.yml` | Weekly GitHub Actions updates |
+| `.github/workflows/ci.yml` | Light CI (hygiene; Terraform soft-skips until `*.tf` exists) |
+| `.github/dependabot.yml` | Weekly GitHub Actions + Terraform updates |
 | `.github/pull_request_template.md` | PR checklist |
 | `.github/ISSUE_TEMPLATE/` | Bug and feature templates |
 
@@ -33,4 +33,4 @@ just ci-scan
 just mise-tools
 ```
 
-After you add HCL, the same recipes run for real (`just init`, `just plan`, `just apply`, …). `just destroy` and `just cleanup` prompt for confirmation.
+`just destroy` and `just cleanup` prompt for confirmation. CI soft-skips Terraform checks while this template has no `*.tf`.

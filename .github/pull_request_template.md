@@ -5,5 +5,5 @@
 ## Checklist
 
 - [ ] Ready for review (prefer non-draft PRs)
-- [ ] CI green, or soft-skip justified (e.g. no `*.tf` yet)
+- [ ] CI green (Terraform job may soft-skip when no `*.tf` yet)
 - [ ] Docs / README updated if behavior or layout changed
