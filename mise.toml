@@ -1,0 +1,5 @@
+[tools]
+terraform = "latest"
+jq = "latest"
+zizmor = "latest"
+pinact = "latest"
