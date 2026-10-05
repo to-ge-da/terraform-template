@@ -1,5 +1,5 @@
 [tools]
-terraform = "latest"
+terraform = "1.16.5"
 jq = "latest"
 zizmor = "latest"
 pinact = "latest"

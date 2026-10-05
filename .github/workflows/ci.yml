@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -26,7 +30,7 @@ jobs:
 
       - name: Scan workflows (zizmor + pinact)
         run: |
-          zizmor .github/dependabot.yml .github/workflows/*.yml --no-exit-codes
+          zizmor .github/dependabot.yml .github/workflows/*.yml
           pinact run --verify .github/workflows/*.yml
 
   terraform:
